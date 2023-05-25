@@ -88,7 +88,7 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
         }
 
         // Выделить уровень заголовка
-        headerIndex = heading[2] - 48;
+        headerIndex = heading[2] - '0';
 
         // Записать заголовок в структуру.
         headerList->header.push_back(headerText);
