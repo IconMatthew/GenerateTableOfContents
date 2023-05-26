@@ -45,7 +45,7 @@ std::string readHtmlFileToString(const char** InputfileName) {
         }
 
         // Записать текущую строку файла в конец строки, содержащей все строки входного файла.
-        fileContent += line + "\n";
+        fileContent += line + " ";
     }
 
     inputFile.close();
@@ -63,6 +63,9 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
 
     // Создать шаблон (регулярное выражение), по которому будут искаться заголовки в HTML коде.
     std::regex headerRegex("<h[1-6](.*?)>(.*?)<\\/h[1-6]>");
+
+    // Создать шаблон, по которому будет проверяться закомментированность заголовка.
+    std::regex commentRegex(".*?-->");
     std::smatch match;
 
     bool headersFound = false;
@@ -74,21 +77,41 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
     while (std::regex_search(searchStart, inputHTML.end(), match, headerRegex)) {
         headersFound = true;
 
-        // Выделить текст заголовка.
+        std::string::const_iterator headerStart = match[0].first;
+        std::string::const_iterator headerEnd = match[0].second;
+
+        // Найти открывающие комментарии перед заголовком.
+        std::smatch commentMatch;
+        std::string::const_iterator commentSearchStart = inputHTML.begin();
+        bool commentFound = false;
+
+        // Если встретился закрывающий комментарий после заголовка - установить начало поиска на конец заголовка.
+        if (std::regex_search(headerStart, inputHTML.end(), commentMatch, commentRegex)) {
+            commentFound = true;
+            commentSearchStart = commentMatch[0].second;
+        }
+
+        if (commentFound) {
+            // Пропустить заголовок, который находится внутри закомментированной области.
+            searchStart = headerEnd;
+            continue;
+        }
+
+        // Извлечь текст заголовка.
         std::string headerText = match.str(2);
 
         // Получить заголовок целиком (с тегами H).
         std::string heading = match.str(0);
 
         std::regex innerHeaderRegex("<h[1-6]");
-      
+
         // Если внутри выделенного заголовка есть другие h-теги - выбросить исключение об ошибке.
         if (std::regex_search(headerText, innerHeaderRegex)) {
             throw std::runtime_error("Невозможно составить оглавление страницы – во входном файле присутствует заголовок, включающий в себя другой заголовок.");
         }
 
         // Выделить уровень заголовка
-        headerIndex = heading[2] - 48;
+        headerIndex = heading[2] - '0';
 
         // Записать заголовок в структуру.
         headerList->header.push_back(headerText);
@@ -102,7 +125,6 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
 
     return headersFound;
 }
-
 
 /* Добавляет нужное количество открывающих/закрывающих тегов неупорядоченного списка 
 в зависимости от индекса заголовка в вектор заголовков, содержащий сформированный 
@@ -234,7 +256,7 @@ int main(int argc, char* argv[]) {
         if (argc < 3) {
            throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
         }
-
+        
         const char* inputFileName = argv[1];
         const char* outputFileName = argv[2];
 
