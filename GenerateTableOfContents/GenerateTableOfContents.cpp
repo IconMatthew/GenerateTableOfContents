@@ -55,6 +55,7 @@ std::string readHtmlFileToString(const char** InputfileName) {
         throw std::runtime_error("Программа принимает на вход файлы, содержащие не менее 1 строки. Убедитесь, что в исходном файле не менее 1 строки.");
     }
 
+    // Вернуть строку, включающую все строки входного файла.
     return fileContent;
 }
 
@@ -73,15 +74,16 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
 
     std::string::const_iterator searchStart = inputHTML.begin();
 
-    // Для каждого слова строки, включающей все строки входного файла(пока не найден конец строки - "\0"):
+    // Для каждого слова строки, включающей все строки входного файла:
     while (std::regex_search(searchStart, inputHTML.end(), match, headerRegex)) {
         headersFound = true;
 
         std::string::const_iterator headerStart = match[0].first;
         std::string::const_iterator headerEnd = match[0].second;
 
-        // Найти открывающие комментарии перед заголовком.
         std::smatch commentMatch;
+
+        // Начать поиск комментариев с начала строки.
         std::string::const_iterator commentSearchStart = inputHTML.begin();
         bool commentFound = false;
 
@@ -110,7 +112,7 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
             throw std::runtime_error("Невозможно составить оглавление страницы – во входном файле присутствует заголовок, включающий в себя другой заголовок.");
         }
 
-        // Выделить уровень заголовка
+        // Выделить уровень заголовка.
         headerIndex = heading[2] - '0';
 
         // Записать заголовок в структуру.
@@ -221,9 +223,9 @@ void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::v
     // Открыть выходной файл.
     std::ofstream outputFile(*outputFileName, std::ios::out | std::ios::binary);
     
-    // Если не удалось открыть файл - выбросить исключение об ошибке.
+    // Если не удалось создать файл - выбросить исключение об ошибке.
     if (!outputFile.is_open()) {
-        throw std::runtime_error("Невозможно открыть выходной файл. Проверьте корректность выходного файла.");
+        throw std::runtime_error("Неверно указан файл для выходных данных. Возможно указанного расположения не существует или нет прав на запись.");
     }
     else {
         // Установить кодек для выходного файла
@@ -251,7 +253,7 @@ int main(int argc, char* argv[]) {
                
         /* 
             Проверить наличие входного и выходного файла в аргументах командной строки. 
-            Если его нет – выбросить исключение об ошибке – (Неверно указан файл с входными данными. Возможно, файл не существует.).
+            Если его нет – выбросить исключение об ошибке.
         */
         if (argc < 3) {
            throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
