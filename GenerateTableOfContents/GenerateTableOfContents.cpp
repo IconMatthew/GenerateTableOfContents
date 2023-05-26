@@ -7,14 +7,9 @@
 #include <stdexcept>
 #include <locale.h>
 #include "Windows.h"
+#include "../GenerateTableOfContents/GenerateTableOfContents.h"
 
 using namespace std;
-
-// Структура данных, содержащая заголовки и их уровни.
-struct headers {
-    std::vector<std::string> header;
-    std::vector<std::string> headerLevel;
-};
 
 /* Функция считывает текст из входного файла, проверяет удовлетворяет ли количество строк в тексте допустимому диапазону,
 выводит ошибки, если есть.*/
