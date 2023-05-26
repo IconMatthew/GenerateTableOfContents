@@ -1,15 +1,16 @@
 #pragma once
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
+#include <sstream>
+#include <regex>
+#include <string>
 #include <vector>
+#include <stdexcept>
+#include <locale.h>
+#include "Windows.h"
 using namespace std;
 
-struct headers
-{
-    string header;
-    string headerLevel;
+struct headers {
+    std::vector<std::string> header;
+    std::vector<std::string> headerLevel;
 };
 
 /*
@@ -34,7 +35,7 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
    param[in] - headerList - структура, содержащая заголовки и их уровни.
    param[out] - outputHeaders - текст выходного файла.
 */
-void insertNestsForHeadersInOutputVector(headers * headerList, vector <string> outputHeaders);
+void insertNestsForHeadersInOutputVector(headers* headerList, std::vector<std::string>& outputHeaders);
 
 /*
    Добавляет нужное количество открывающих/закрывающих тегов неупорядоченного списка 
@@ -44,18 +45,18 @@ void insertNestsForHeadersInOutputVector(headers * headerList, vector <string> o
    param[in] - isOpenNest - тип тега, который необходимо вставить.
    param[in/out] - outputHeaders - список заголовков.
 */
-void insertULTagsInOutputVector(int levelOfHeader, vector <string> outputHeaders, bool isOpenNest);
+void insertULTagsInOutputVector(int levelOfHeader, std::vector<std::string>& outputHeaders, bool isOpenNest);
 
 /*
    Создаёт код HTML страницы и добавляет выделенные вложенные заголовки.
    param[in/out] - outputHeaders - список, содержащий заголовки с учётом вложенности.
    param[in] - headerList - структура, содержащая заголовки и их уровни.
 */
-void formOutputHtmlCode(vector <string> outputHeaders, headers* headerList);
+void formOutputHtmlCode(std::vector<std::string>& outputHeaders, headers* headerList);
 
 /*
    Создаёт код HTML страницы и добавляет выделенные вложенные заголовки.
    param[in] - outputFileName - имя выходного файла.
    param[in] - outputHTML - текст выходного файла.
 */
-void printOutputHtmlCodeIntoOutputFile(char** outputFileName, vector <string> outputHTML);
+void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::vector<std::string>& outputHTML);
