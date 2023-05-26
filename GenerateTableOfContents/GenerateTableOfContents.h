@@ -50,9 +50,8 @@ void insertULTagsInOutputVector(int levelOfHeader, std::vector<std::string>& out
 /*
    Создаёт код HTML страницы и добавляет выделенные вложенные заголовки.
    param[in/out] - outputHeaders - список, содержащий заголовки с учётом вложенности.
-   param[in] - headerList - структура, содержащая заголовки и их уровни.
 */
-void formOutputHtmlCode(std::vector<std::string>& outputHeaders, headers* headerList);
+void formOutputHtmlCode(std::vector<std::string>& outputHeaders);
 
 /*
    Создаёт код HTML страницы и добавляет выделенные вложенные заголовки.

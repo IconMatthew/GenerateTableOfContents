@@ -178,7 +178,7 @@ void insertNestsForHeadersInOutputVector(headers* headerList, std::vector<std::s
 }
 
 // Создаёт код HTML страницы и добавляет выделенные вложенные заголовки.
-void formOutputHtmlCode(std::vector<std::string>& outputHeaders, headers* headerList) {
+void formOutputHtmlCode(std::vector<std::string>& outputHeaders) {
 
     // Создать вектор, содержащий каркас HTML кода страницы.
     std::vector<std::string> htmlCode = {
@@ -282,7 +282,7 @@ int main(int argc, char* argv[]) {
             insertNestsForHeadersInOutputVector(&headerList, outputHeaders);
 
             // Вызвать функцию, формирующую список строк выходного кода HTML – страницы.
-            formOutputHtmlCode(outputHeaders, &headerList);
+            formOutputHtmlCode(outputHeaders);
 
             // Вызвать функцию, записывающую выходной код страницы в выходной файл.
             printOutputHtmlCodeIntoOutputFile(&outputFileName, outputHeaders);
