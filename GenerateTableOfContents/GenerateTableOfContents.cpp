@@ -104,6 +104,7 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
 
         // Если внутри выделенного заголовка есть другие h-теги - выбросить исключение об ошибке.
         if (std::regex_search(headerText, innerHeaderRegex)) {
+            headersFound = false;
             throw std::runtime_error("Невозможно составить оглавление страницы – во входном файле присутствует заголовок, включающий в себя другой заголовок.");
         }
 
