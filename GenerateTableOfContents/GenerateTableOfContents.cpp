@@ -55,44 +55,33 @@ std::string readHtmlFileToString(const char** InputfileName) {
 }
 
 // Функция выделяет заголовки с их уровнями в структуру данных headers.
-bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* headerList) {
+bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerList) {
 
     // Создать шаблон (регулярное выражение), по которому будут искаться заголовки в HTML коде.
     std::regex headerRegex("<h[1-6](.*?)>(.*?)<\\/h[1-6]>");
+    std::smatch match;
 
     // Создать шаблон, по которому будет проверяться закомментированность заголовка.
-    std::regex commentRegex(".*?-->");
-    std::smatch match;
+    std::regex commentRegex("<!--.*?-->");
+    //std::regex scriptRegex("<script.*?>.*?<!script>");inputHTML = std::regex_replace(inputHTML, scriptRegex, format);
+    const std::string format("");
+
+    // Remove all commented headers from the inputHTML string.
+    inputHTML = std::regex_replace(inputHTML, commentRegex, format);
+    
+    const std::string remadeHTML = inputHTML;
 
     bool headersFound = false;
     int headerIndex = 0;
 
-    std::string::const_iterator searchStart = inputHTML.begin();
+    std::string::const_iterator searchStart = remadeHTML.begin();
 
-    // Для каждого слова строки, включающей все строки входного файла:
-    while (std::regex_search(searchStart, inputHTML.end(), match, headerRegex)) {
+    // Для каждого совпадения строки, включающей все строки входного файла:
+    while (std::regex_search(searchStart, remadeHTML.end(), match, headerRegex)) {
         headersFound = true;
 
         std::string::const_iterator headerStart = match[0].first;
         std::string::const_iterator headerEnd = match[0].second;
-
-        std::smatch commentMatch;
-
-        // Начать поиск комментариев с начала строки.
-        std::string::const_iterator commentSearchStart = inputHTML.begin();
-        bool commentFound = false;
-
-        // Если встретился закрывающий комментарий после заголовка - установить начало поиска на конец заголовка.
-        if (std::regex_search(headerStart, inputHTML.end(), commentMatch, commentRegex)) {
-            commentFound = true;
-            commentSearchStart = commentMatch[0].second;
-        }
-
-        if (commentFound) {
-            // Пропустить заголовок, который находится внутри закомментированной области.
-            searchStart = headerEnd;
-            continue;
-        }
 
         // Извлечь текст заголовка.
         std::string headerText = match.str(2);
@@ -124,8 +113,9 @@ bool insertHeaderTagsInHeadersStructure(const std::string& inputHTML, headers* h
     return headersFound;
 }
 
-/* Добавляет нужное количество открывающих/закрывающих тегов неупорядоченного списка 
-в зависимости от индекса заголовка в вектор заголовков, содержащий сформированный 
+
+/* Добавляет нужное количество открывающих/закрывающих тегов неупорядоченного списка
+в зависимости от индекса заголовка в вектор заголовков, содержащий сформированный
 код HTML страницы.*/
 void insertULTagsInOutputVector(int levelOfHeader, std::vector<std::string>& outputHeaders, bool isOpenNest) {
     std::string ulTag;
@@ -166,7 +156,7 @@ void insertNestsForHeadersInOutputVector(headers* headerList, std::vector<std::s
             // В зависимости от уровня заголовка добавить нужное количество закрывающих тегов неупорядоченного списка в вектор.
             insertULTagsInOutputVector(previousHeaderIndex - currentHeaderIndex, outputHeaders, false);
         }
-        
+
         // Добавить текст заголовка, окружённый тегами элемента списка <li> в вектор заголовков.
         outputHeaders.push_back("<li><a href=\"#\">" + headerList->header[i] + "</a></li>");
 
@@ -218,7 +208,7 @@ void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::v
 
     // Открыть выходной файл.
     std::ofstream outputFile(*outputFileName, std::ios::out | std::ios::binary);
-    
+
     // Если не удалось создать файл - выбросить исключение об ошибке.
     if (!outputFile.is_open()) {
         throw std::runtime_error("Неверно указан файл для выходных данных. Возможно указанного расположения не существует или нет прав на запись.");
@@ -233,7 +223,7 @@ void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::v
             // Записать текущую строку выходного вектора в выходной файл.
             outputFile << line << '\n';
         }
-       
+
     }
 
     // Закрыть выходной файл
@@ -246,24 +236,29 @@ int main(int argc, char* argv[]) {
     setlocale(LC_ALL, ".1251");
 
     try {
-               
-        /* 
-            Проверить наличие входного и выходного файла в аргументах командной строки. 
+
+        /*
+            Проверить наличие входного и выходного файла в аргументах командной строки.
             Если его нет – выбросить исключение об ошибке.
         */
         if (argc < 3) {
-           throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
+            throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
         }
-        
+
         const char* inputFileName = argv[1];
         const char* outputFileName = argv[2];
+
+        /*
+        const char* inputFileName = "input.html";
+        const char* outputFileName = "output.html";
+        */
 
         // Вызвать функцию, считывающую текст из входного файла в строку, содержащую все строки входного файла.
         std::string inputHTML = readHtmlFileToString(&inputFileName);
 
         // Создать структуру данных, содержащую текст заголовков и их уровени.
         headers headerList;
-        
+
         // Вызвать функцию, записывающую заголовки и их уровни в структуру заголовков.
         bool headersFound = insertHeaderTagsInHeadersStructure(inputHTML, &headerList);
 
@@ -287,7 +282,7 @@ int main(int argc, char* argv[]) {
             // Вызвать функцию, записывающую выходной код страницы в выходной файл.
             printOutputHtmlCodeIntoOutputFile(&outputFileName, outputHeaders);
         }
-        
+
     }
 
     // Если где-то были выброшены исключения об ошибке: вывести сообщение ошибки в консоль.
