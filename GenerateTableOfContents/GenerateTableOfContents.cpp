@@ -11,6 +11,28 @@
 
 using namespace std;
 
+/*!
+*\file
+*\brief Файл содержит вызываемые функции программы, а также управляющую функцию.
+*\mainpage Документация для программы "GenerateTableOfContents"
+Программа должна определять оглавление HTML-страницы на основании заголовков «H», а также визуально отображать заголовки и их вложенность при помощи отступов.
+
+Для функционирования программы необходима операционная система Windows 10 или выше.
+Программа будет разработана на языке С++ с применением библиотек <iostream>, <fstream>, <sstream>, <string>, <regex>, <vector>, <locale.h>, "Windows.h". Дополнительного программного обеспечения не требуется.
+Входные файлы могут быть подготовлены в редакторе Блокнот. Необходимо заменить расширения входных файлов на ".html". Выходные файлы могут быть прочитаны с его помощью.
+
+Стандарт языка ISO C++17 (/std:c++17). Исходный код программы является кроссплатформенным.
+Программа должна получать два параметра командной строки: имя входного файла с исходным кодом HTML-страницы и имя файла для записи оглавления страницы.
+
+Пример команды запуска программы:
+*\code
+GenerateTableOfContents.exe C:\\Documents\input.html C:\\Documents\output.html
+*\endcode
+*\author Жадаев Матвей Юрьевич
+*\date Май 2023 года
+*\version 1.0
+*/
+
 /* Функция считывает текст из входного файла, проверяет удовлетворяет ли количество строк в тексте допустимому диапазону,
 выводит ошибки, если есть.*/
 std::string readHtmlFileToString(const char** InputfileName) {
@@ -63,12 +85,12 @@ bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerL
 
     // Создать шаблон, по которому будет проверяться закомментированность заголовка.
     std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>");
-    
+
     const std::string format("");
 
     // Удалить все многострочные комментарии в строке с кодом входного файла.
     inputHTML = std::regex_replace(inputHTML, commentRegex, format);
-    
+
     const std::string remadeHTML = inputHTML;
 
     bool headersFound = false;
@@ -230,7 +252,9 @@ void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::v
     outputFile.close();
 }
 
-// Sample Input in cmd: 1. cd C:\Users\jadae\source\repos\GenerateTableOfContents\x64\Debug 2. GenerateTableOfContents.exe input.html output.html
+/**
+* @brief Обеспечивает проверку корректности входного файла, вывод в консоль ошибок, если они есть, вызов функций, решающих задачу.
+*/
 int main(int argc, char* argv[]) {
 
     setlocale(LC_ALL, ".1251");
@@ -246,12 +270,7 @@ int main(int argc, char* argv[]) {
         }
 
         const char* inputFileName = argv[1];
-        const char* outputFileName = argv[2];
-
-        /*
-        const char* inputFileName = "input.html";
-        const char* outputFileName = "output.html";
-        */
+        const char* outputFileName = argv[2];        
 
         // Вызвать функцию, считывающую текст из входного файла в строку, содержащую все строки входного файла.
         std::string inputHTML = readHtmlFileToString(&inputFileName);
