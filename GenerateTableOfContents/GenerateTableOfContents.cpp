@@ -255,7 +255,7 @@ void printOutputHtmlCodeIntoOutputFile(const char** outputFileName, const std::v
 */
 int main(int argc, char* argv[]) {
 
-    setlocale(LC_ALL, ".1251");
+    setlocale(LC_ALL, "ru");
 
     try {
 
