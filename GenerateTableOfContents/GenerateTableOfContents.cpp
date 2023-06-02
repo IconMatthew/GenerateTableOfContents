@@ -39,7 +39,7 @@ std::string readHtmlFileToString(const char** InputfileName) {
 
     // Открыть входной файл.
     std::ifstream inputFile(*InputfileName);
-
+    
     // Если не удалось открыть файл - выбросить исключение об ошибке.
     if (!inputFile.is_open()) {
         throw std::runtime_error("Не удалось открыть входной файл. Проверьте введённые параметры.");
@@ -50,7 +50,7 @@ std::string readHtmlFileToString(const char** InputfileName) {
     int lineCount = 0;
     const int maxLines = 5000;
 
-    // Пока не достигнут конец файла: 
+    // Пока не достигнут конец файла:
     while (std::getline(inputFile, line)) {
 
         // Увеличить счётчик обнаруженных строк.
@@ -88,10 +88,8 @@ bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerL
 
     const std::string format("");
 
-    // Удалить все многострочные комментарии в строке с кодом входного файла.
-    inputHTML = std::regex_replace(inputHTML, commentRegex, format);
-
-    const std::string remadeHTML = inputHTML;
+    // Удалить все многострочные комментарии и теги script в строке с кодом входного файла вместе с их содержимым.
+    const std::string remadeHTML = std::regex_replace(inputHTML, commentRegex, format);
 
     bool headersFound = false;
     int headerIndex = 0;
@@ -268,10 +266,10 @@ int main(int argc, char* argv[]) {
         if (argc < 3) {
             throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
         }
-
+        
         const char* inputFileName = argv[1];
         const char* outputFileName = argv[2];        
-
+        
         // Вызвать функцию, считывающую текст из входного файла в строку, содержащую все строки входного файла.
         std::string inputHTML = readHtmlFileToString(&inputFileName);
 
