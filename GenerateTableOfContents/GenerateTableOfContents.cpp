@@ -85,14 +85,12 @@ bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerL
 
     // Создать шаблон, по которому будет проверяться закомментированность заголовка.
     std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>");
-
     const std::string format("");
 
     // Удалить все многострочные комментарии и теги script в строке с кодом входного файла вместе с их содержимым.
     const std::string remadeHTML = std::regex_replace(inputHTML, commentRegex, format);
 
     bool headersFound = false;
-    int headerIndex = 0;
 
     std::string::const_iterator searchStart = remadeHTML.begin();
 
@@ -100,25 +98,20 @@ bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerL
     while (std::regex_search(searchStart, remadeHTML.end(), match, headerRegex)) {
         headersFound = true;
 
-        std::string::const_iterator headerStart = match[0].first;
-        std::string::const_iterator headerEnd = match[0].second;
-
         // Извлечь текст заголовка.
         std::string headerText = match.str(2);
 
         // Получить заголовок целиком (с тегами H).
         std::string heading = match.str(0);
-
         std::regex innerHeaderRegex("<h[1-6]");
 
         // Если внутри выделенного заголовка есть другие h-теги - выбросить исключение об ошибке.
         if (std::regex_search(headerText, innerHeaderRegex)) {
-            headersFound = false;
             throw std::runtime_error("Невозможно составить оглавление страницы – во входном файле присутствует заголовок, включающий в себя другой заголовок.");
         }
 
         // Выделить уровень заголовка.
-        headerIndex = heading[2] - '0';
+        int headerIndex = heading[2] - '0';
 
         // Записать заголовок в структуру.
         headerList->header.push_back(headerText);
@@ -208,9 +201,7 @@ void formOutputHtmlCode(std::vector<std::string>& outputHeaders) {
     };
 
     // Добавить в вектор с каркасом HTML кода выделенные заголовки, обрамлённые тегами элемента списка, с учётом их вложенности.
-    for (const std::string& header : outputHeaders) {
-        htmlCode.push_back(header);
-    }
+    std::copy(outputHeaders.begin(), outputHeaders.end(), std::back_inserter(htmlCode));
 
     // Добавить закрывающий тег неупорядоченного списка для формирования первого уровня вложенности.
     htmlCode.push_back("</ul>");
@@ -262,14 +253,14 @@ int main(int argc, char* argv[]) {
         /*
             Проверить наличие входного и выходного файла в аргументах командной строки.
             Если его нет – выбросить исключение об ошибке.
-        */
+        */ 
         if (argc < 3) {
             throw std::runtime_error("Неверные входные параметры. Возможно, файлы не существуют или доступ к ним осуществляется по другому пути.");
         }
         
         const char* inputFileName = argv[1];
-        const char* outputFileName = argv[2];        
-        
+        const char* outputFileName = argv[2];    
+
         // Вызвать функцию, считывающую текст из входного файла в строку, содержащую все строки входного файла.
         std::string inputHTML = readHtmlFileToString(&inputFileName);
 
@@ -279,8 +270,7 @@ int main(int argc, char* argv[]) {
         // Вызвать функцию, записывающую заголовки и их уровни в структуру заголовков.
         bool headersFound = insertHeaderTagsInHeadersStructure(inputHTML, &headerList);
 
-        // Создать выходной список строк, которые будут записаны в выходной файл.
-        vector<string> outputHeaders;
+        
 
         // Если не был выделен хотя бы один заголовок - выбросить исключение об ошибке.
         if (!headersFound) {
@@ -289,6 +279,9 @@ int main(int argc, char* argv[]) {
 
         // Иначе
         else {
+
+            // Создать выходной список строк, которые будут записаны в выходной файл.
+            vector<string> outputHeaders;
 
             // Добавить в выходной вектор все выделенные заголовки и теги вложенности для них.
             insertNestsForHeadersInOutputVector(&headerList, outputHeaders);
