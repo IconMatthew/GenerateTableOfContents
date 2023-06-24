@@ -84,12 +84,8 @@ bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerL
     static std::smatch match;
 
     // Создать шаблон, по которому будет проверяться закомментированность заголовка.
-<<<<<<< HEAD
-    std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>");
-=======
     std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>|\".*?\"|\'.*?\'");
 
->>>>>>> 9c3d4ae5b6f96bc2a785394d0918810ce1db68d7
     const std::string format("");
     
     // Удалить все многострочные комментарии и теги script в строке с кодом входного файла вместе с их содержимым.
