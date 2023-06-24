@@ -78,15 +78,20 @@ std::string readHtmlFileToString(const char** InputfileName) {
 
 // Функция выделяет заголовки с их уровнями в структуру данных headers.
 bool insertHeaderTagsInHeadersStructure(std::string& inputHTML, headers* headerList) {
-
+    
     // Создать шаблон (регулярное выражение), по которому будут искаться заголовки в HTML коде.
-    std::regex headerRegex("<h[1-6](.*?)>(.*?)<\\/h[1-6]>");
-    std::smatch match;
+    static std::regex headerRegex("<h[1-6](.*?)>(.*?)<\\/h[1-6]>");
+    static std::smatch match;
 
     // Создать шаблон, по которому будет проверяться закомментированность заголовка.
+<<<<<<< HEAD
     std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>");
-    const std::string format("");
+=======
+    std::regex commentRegex("<!--.*?-->|<script(.*?)>.*?<\/script>|\".*?\"|\'.*?\'");
 
+>>>>>>> 9c3d4ae5b6f96bc2a785394d0918810ce1db68d7
+    const std::string format("");
+    
     // Удалить все многострочные комментарии и теги script в строке с кодом входного файла вместе с их содержимым.
     const std::string remadeHTML = std::regex_replace(inputHTML, commentRegex, format);
 
@@ -261,6 +266,12 @@ int main(int argc, char* argv[]) {
         const char* inputFileName = argv[1];
         const char* outputFileName = argv[2];    
 
+<<<<<<< HEAD
+=======
+        //const char* inputFileName = "input.html";
+        //const char* outputFileName = "output.html";
+        
+>>>>>>> 9c3d4ae5b6f96bc2a785394d0918810ce1db68d7
         // Вызвать функцию, считывающую текст из входного файла в строку, содержащую все строки входного файла.
         std::string inputHTML = readHtmlFileToString(&inputFileName);
 
